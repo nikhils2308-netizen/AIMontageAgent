@@ -1,13 +1,11 @@
-import subprocess
 import json
 import os
 
+from huggingface_hub import InferenceClient
+
 
 # ==================================================
-# Ollama model
-# ==================================================
-
-MODEL = "qwen3:1.7b"
+MODEL = "google/gemma-2-2b-it"
 
 
 # ==================================================
@@ -45,27 +43,37 @@ Important:
 - Return only JSON.
 """
 
-    result = subprocess.run(
-        [
-            "ollama",
-            "run",
-            MODEL,
-            prompt
-        ],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace"
-    )
+    token = os.environ.get("HF_TOKEN")
 
-    if result.returncode != 0:
+    if not token:
+        print("HF_TOKEN environment variable is missing.")
+        return None
 
-        print("Ollama error:")
-        print(result.stderr)
+    try:
+
+        client = InferenceClient(api_key=token, provider="featherless-ai")
+
+        result = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            max_tokens=300,
+            temperature=0.2
+        )
+
+        response = result.choices[0].message.content.strip()
+
+    except Exception as error:
+
+        print("Hugging Face AI error:")
+        print(error)
 
         return None
 
-    response = result.stdout.strip()
 
     # ==================================================
     # Find JSON
@@ -77,11 +85,11 @@ Important:
     if start == -1 or end == -1:
 
         print(
-            "Could not find JSON in Ollama response."
+            "Could not find JSON in AI response."
         )
 
         print()
-        print("Ollama response:")
+        print("AI response:")
         print(response)
 
         return None
@@ -89,6 +97,7 @@ Important:
     json_text = response[
         start:end + 1
     ]
+
 
     # ==================================================
     # Parse JSON
@@ -103,7 +112,7 @@ Important:
     except json.JSONDecodeError:
 
         print(
-            "Ollama returned invalid JSON."
+            "AI returned invalid JSON."
         )
 
         print()
@@ -111,6 +120,7 @@ Important:
         print(response)
 
         return None
+
 
     # ==================================================
     # Normalize duration
