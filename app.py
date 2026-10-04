@@ -209,10 +209,7 @@ if generate:
 
 
         process = subprocess.run(
-            [
-                "python",
-                "src\\ai_montage_agent.py"
-            ],
+            ["python", "src/ai_montage_agent.py"],
             input=editing_idea + "\n",
             text=True,
             encoding="utf-8",
