@@ -1,6 +1,6 @@
 import subprocess
 import os
-import shutil
+
 
 print()
 print("=" * 60)
@@ -14,6 +14,11 @@ instruction = input("Enter your editing idea: ")
 if not instruction.strip():
     print("No editing instruction provided.")
     exit()
+
+
+# ============================================================
+# STEP 1: AI EDITING PLAN
+# ============================================================
 
 print()
 print("=" * 60)
@@ -32,6 +37,11 @@ if planner.returncode != 0:
     print("AI planner failed.")
     exit()
 
+
+# ============================================================
+# STEP 2: GENERATE CANDIDATES
+# ============================================================
+
 print()
 print("=" * 60)
 print("STEP 2: Generating montage candidates...")
@@ -47,6 +57,11 @@ generator = subprocess.run(
 if generator.returncode != 0:
     print("Candidate generation failed.")
     exit()
+
+
+# ============================================================
+# STEP 3: ANALYZE AND SELECT BEST
+# ============================================================
 
 print()
 print("=" * 60)
@@ -64,25 +79,29 @@ if analyzer.returncode != 0:
     print("Montage analysis failed.")
     exit()
 
-print()
-print("=" * 60)
-print("AI MONTAGE COMPLETE")
-print("=" * 60)
+
+# ============================================================
+# FINAL OUTPUT
+# ============================================================
 
 final_output = os.path.join(
     "output",
     "final_montage.mp4"
 )
 
+print()
+
 if os.path.exists(final_output):
 
+    print("=" * 60)
+    print("AI MONTAGE COMPLETE")
+    print("=" * 60)
     print()
     print("FINAL MONTAGE CREATED")
-    print("=" * 60)
     print(f"Output: {final_output}")
 
 else:
 
-    print()
+    print("=" * 60)
     print("FINAL MONTAGE NOT FOUND")
     print("=" * 60)
